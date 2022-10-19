@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Пользователи</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link media="all" rel="stylesheet" th:href="@{/css/style1.css}" type="text/css"/>
+    <link media="all" rel="stylesheet" th:href="@{/css/style2.css}" type="text/css"/>
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <div class="container">
+            <a class="navbar-brand" href="/post/index">BlogSpring</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/post/index">Посты</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/index">Пользователи</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/comment/index">Комментарии</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<div class="container">
+    <h1>Все пользователи</h1>
+    <form>
+        <div class="form-inline form-group">
+            <input type="text" name="email"  class="form-control" placeholder="Email"/>
+            &nbsp;&nbsp;
+            <input type="checkbox" name="exactSearch">
+            &nbsp;&nbsp;
+            <label>Точный поиск</label>
+            &nbsp;&nbsp;
+            <input class="btn btn-success" formmethod="get" type="submit" formaction="/user/index" value="Поиск" />
+        </div>
+    </form>
+    <a class="btn btn-primary" href="create" style="margin-bottom:0.5em">Добавить</a>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>
+                Фамилия
+            </th>
+            <th>
+                Имя
+            </th>
+            <th>
+                Отчество
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+                Пароль
+            </th>
+            <th>
+                Дата рождения
+            </th>
+        </tr>
+        </thead>
+        <tbody th:each="el : ${users}">
+        <tr>
+            <td th:text="${el.surname}"/>
+            <td th:text="${el.name}"/>
+            <td th:text="${el.lastName}"/>
+            <td th:text="${el.email}"/>
+            <td th:text="${el.password}"/>
+            <td th:text="${el.dateBirth}"/>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+<footer class="border-top footer text-muted">
+    <div class="container">
+        &copy; 2022 - SpringHasCome
+    </div>
+</footer>
+</html>
