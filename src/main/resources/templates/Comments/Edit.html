@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Добавление нового пользователя</title>
+    <title>Изменение комментария</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link media="all" rel="stylesheet" th:href="@{/css/style1.css}" type="text/css"/>
     <link media="all" rel="stylesheet" th:href="@{/css/style2.css}" type="text/css"/>
@@ -29,37 +29,27 @@
     </nav>
 </header>
 <div class="container">
-    <h1>Новый пользователь</h1>
+    <h1>Комментарий</h1>
     <div class="row">
         <div class="col-md-4">
-            <form th:action="${'/user/create'}" method="post">
+            <form th:action="${'/comment/editComment'}" method="post">
                 <div class="form-group">
-                    <label class="control-label">Имя</label>
-                    <input type="text" class="form-control" name="name">
+                    <label class="control-label">Текст</label>
+                    <textarea class="form-control" name="text" th:text="${comment.text}"></textarea>
                 </div>
                 <div class="form-group">
-                    <label class="control-label">Фамилия</label>
-                    <input type="text" class="form-control" name="surname">
+                    <label class="control-label">Создатель</label>
+                    <select name="userId" class="form-control">
+                        <div th:each="el : ${users}">
+                            <option th:selected="${el.id == comment.user.id}" th:value="${el.id}" th:text="${el.email}"/>
+                        </div>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label class="control-label">Отчество</label>
-                    <input type="text" class="form-control" name="lastName">
-                </div>
-                <div class="form-group">
-                    <label class="control-label">Электронная почта</label>
-                    <input type="text" class="form-control" name="email">
-                </div>
-                <div class="form-group">
-                    <label class="control-label">Пароль</label>
-                    <input type="password" class="form-control" name="password" >
-                </div>
-                <div class="form-group">
-                    <label class="control-label">Дата рождения</label>
-                    <input type="date" class="form-control" name="dateBirth">
-                </div>
-                <div class="form-group">
-                    <button class="btn btn-success" type="submit">Добавить</button>
-                    <a class="btn btn-danger" href="/user/index">Отмена</a>
+                    <input type="hidden" name="postId" th:value="${post.id}"/>
+                    <input type="hidden" name="id" th:value="${comment.id}"/>
+                    <button class="btn btn-success" type="submit">Изменить</button>
+                    <a class="btn btn-danger" href="/post/index">Отмена</a>
                 </div>
             </form>
         </div>

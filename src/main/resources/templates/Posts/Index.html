@@ -23,55 +23,51 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/user/index">Пользователи</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/comment/index">Комментарии</a>
-                    </li>
                 </ul>
+                <form>
+                    <div class="form-inline form-group">
+                        <input type="text" name="description"  class="form-control" placeholder="Тема"/>
+                        <div class="col-auto my-0">
+                            <div class="custom-control custom-checkbox mr-sm-2">
+                                <input type="checkbox" class="custom-control-input" id="customControl">
+                                <label class="custom-control-label" for="customControl">Точный поиск</label>
+                            </div>
+                        </div>
+                        <input class="btn btn-success" formmethod="get" type="submit" formaction="/post/index" value="Поиск" />
+                    </div>
+                </form>
             </div>
         </div>
     </nav>
 </header>
 <div class="container">
     <h1>Все посты</h1>
-    <form>
-        <div class="form-inline form-group">
-            <input type="text" name="title"  class="form-control" placeholder="Тема"/>
-            &nbsp;&nbsp;
-            <input type="checkbox" name="exactSearch">
-            &nbsp;&nbsp;
-            <label>Точный поиск</label>
-            &nbsp;&nbsp;
-            <input class="btn btn-success" formmethod="get" type="submit" formaction="/post/index" value="Поиск" />
-        </div>
-    </form>
     <a class="btn btn-primary" href="/post/create" style="margin-bottom:0.5em">Добавить</a>
-    <div>
-        <hr/>
-        <tbody th:each="el : ${posts}">
-        <dl class="row">
-            <dd class="col-sm-10">
-               Автор: <a th:text="${el.user.email}">
-            </a>
-            </dd>
+    <div class="card card_margin" th:each="el : ${posts}">
+        <div class="card-header">
+            <a class="card-title" th:text="${el.user.email}"/>
+            </br>
             <a th:text="${el.dateCreation}" class="opacity"/>
-            <dd class="col-sm-10">
-                Тема: <a th:text="${el.title}"/>
-            </dd>
-            <dd class="col-sm-10">
-               Описание: <a th:text="${el.description}"/>
-            </dd>
-            <dd class="col-sm-10">
-                Лайков: <a th:text="${el.likeCount}"/>
-            </dd>
-        </dl>
-        </tbody>
-        <hr/>
+        </div>
+        <div class="card-body">
+            Тема: <h4 class="card-title" th:text="${el.title}"/>
+            Описание: <h6 class="card-title" th:text="${el.description}"/>
+        </div>
+        <div class="card-footer">
+            ❤ <a th:text="${el.likeCount}"/>
+        </div>
+        <div class="btn-group">
+            <form th:action="@{/post/details}" method="get">
+                <input type="hidden" th:value="${el.id}" name="id">
+                <input value="Посмотреть" type="submit" class="btn btn-outline-info">
+            </form>
+        </div>
     </div>
 </div>
-</body>
 <footer class="border-top footer text-muted">
     <div class="container">
         &copy; 2022 - SpringHasCome
     </div>
 </footer>
+</body>
 </html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <title>Информация о посте</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link media="all" rel="stylesheet" th:href="@{/css/style1.css}" type="text/css"/>
+    <link media="all" rel="stylesheet" th:href="@{/css/style2.css}" type="text/css"/>
+    <script th:src="@{/CSS/bootstrap.js}"></script>
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <div class="container">
+            <a class="navbar-brand" href="/post/index">BlogSpring</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/post/index">Посты</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/index">Пользователи</a>
+                    </li>
+                </ul>
+                <form>
+                    <div class="form-inline form-group">
+                        <input type="text" name="description"  class="form-control" placeholder="Тема"/>
+                        <div class="col-auto my-0">
+                            <div class="custom-control custom-checkbox mr-sm-2">
+                                <input type="checkbox" class="custom-control-input" id="customControl">
+                                <label class="custom-control-label" for="customControl">Точный поиск</label>
+                            </div>
+                        </div>
+                        <input class="btn btn-success" formmethod="get" type="submit" formaction="/post/index" value="Поиск" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </nav>
+</header>
+<div class="container">
+    <div class="card card_margin">
+        <div class="card-header">
+            <dl class="row">
+                <dd class="col-sm-10">
+                    Автор: <a th:text="${post.user.email}"/>
+                </dd>
+                <a th:text="${post.dateCreation}" class="opacity"/>
+                <dd class="col-sm-10">
+                    Тема: <a th:text="${post.title}"/>
+                </dd>
+                <dd class="col-sm-10">
+                    Описание: <a th:text="${post.description}"/>
+                </dd>
+            </dl>
+        </div>
+        <div class="card-body">
+            <a th:text="${post.text}"/>
+        </div>
+        <div class="card-footer">
+            ❤ <a th:text="${post.likeCount}"/>
+        </div>
+        <div class="btn-group">
+            <form th:action="@{/post/edit}" method="post" class="pr-3">
+                <input type="hidden" th:value="${post.id}" name="id">
+                <input value="Редактировать" type="submit" class="btn btn-outline-primary">
+            </form>
+            <form th:action="@{/post/delete}" method="post" class="pr-3">
+                <input type="hidden" th:value="${post.id}" name="id">
+                <input value="Удалить" type="submit" class="btn btn-outline-danger">
+            </form>
+        </div>
+    </div>
+    <form th:action="@{/comment/create}" method="get">
+        <input type="hidden" th:value="${post.id}" name="postId"/>
+        <input value="Написать комментарий" type="submit" class="btn btn-primary"/>
+    </form>
+    <hr/>
+    <tbody th:each="el : ${comments}">
+    <dl class="row">
+        <dd class="col-sm-10">
+            Автор: <a th:text="${el.user.email}"/>
+        </dd>
+        <a th:text="${el.dateCreation}" class="opacity"/>
+        <dd class="col-sm-10">
+            👍 <a th:text="${el.likeCount}"/>
+        </dd>
+    </dl>
+    <a th:text="${el.text}"/>
+    <br/>
+    <div class="btn-group">
+        <form th:action="@{/comment/edit}" method="post" class="pr-3">
+            <input type="hidden" th:value="${el.id}" name="id">
+            <input type="hidden" th:value="${post.id}" name="postId">
+            <input value="Редактировать" type="submit" class="btn btn-outline-primary">
+        </form>
+        <form th:action="@{/comment/delete}" method="post" class="pr-3">
+            <input type="hidden" th:value="${el.id}" name="id">
+            <input type="hidden" th:value="${post.id}" name="postId">
+            <input value="Удалить" type="submit" class="btn btn-outline-danger">
+        </form>
+        <form th:action="@{/comment/details}" method="post">
+            <input type="hidden" th:value="${el.id}" name="id">
+            <input type="hidden" th:value="${post.id}" name="postId">
+            <input value="Посмотреть" type="submit" class="btn btn-outline-info">
+        </form>
+    </div>
+    <hr/>
+    </div>
+</div>
+</body>
+<footer class="border-top footer text-muted">
+    <div class="container">
+        &copy; 2022 - SpringHasCome
+    </div>
+</footer>
+</html>

@@ -13,7 +13,6 @@ public class Post {
     private int likeCount;
     @Temporal(TemporalType.DATE)
     private Date dateCreation;
-
     @ManyToOne
     @JoinColumn(name = "userId", referencedColumnName = "id")
     private User user;

@@ -5,6 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link media="all" rel="stylesheet" th:href="@{/css/style1.css}" type="text/css"/>
     <link media="all" rel="stylesheet" th:href="@{/css/style2.css}" type="text/css"/>
+    <script th:src="@{/CSS/bootstrap.js}"></script>
 </head>
 <body>
 <header>
@@ -23,28 +24,26 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/user/index">Пользователи</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/comment/index">Комментарии</a>
-                    </li>
                 </ul>
+                <form>
+                    <div class="form-inline form-group">
+                        <input type="text" name="email"  class="form-control" placeholder="Email"/>
+                        <div class="col-auto my-0">
+                            <div class="custom-control custom-checkbox mr-sm-2">
+                                <input type="checkbox" class="custom-control-input" id="customControl">
+                                <label class="custom-control-label" for="customControl">Точный поиск</label>
+                            </div>
+                        </div>
+                        <input class="btn btn-success" formmethod="get" type="submit" formaction="/user/index" value="Поиск" />
+                    </div>
+                </form>
             </div>
         </div>
     </nav>
 </header>
 <div class="container">
     <h1>Все пользователи</h1>
-    <form>
-        <div class="form-inline form-group">
-            <input type="text" name="email"  class="form-control" placeholder="Email"/>
-            &nbsp;&nbsp;
-            <input type="checkbox" name="exactSearch">
-            &nbsp;&nbsp;
-            <label>Точный поиск</label>
-            &nbsp;&nbsp;
-            <input class="btn btn-success" formmethod="get" type="submit" formaction="/user/index" value="Поиск" />
-        </div>
-    </form>
-    <a class="btn btn-primary" href="create" style="margin-bottom:0.5em">Добавить</a>
+    <a class="btn btn-primary" href="/user/create" style="margin-bottom:0.5em">Добавить</a>
     <table class="table">
         <thead>
         <tr>
@@ -61,10 +60,10 @@
                 Email
             </th>
             <th>
-                Пароль
+                Дата рождения
             </th>
             <th>
-                Дата рождения
+                Действия
             </th>
         </tr>
         </thead>
@@ -74,8 +73,22 @@
             <td th:text="${el.name}"/>
             <td th:text="${el.lastName}"/>
             <td th:text="${el.email}"/>
-            <td th:text="${el.password}"/>
             <td th:text="${el.dateBirth}"/>
+            <td>
+                <div class="btn-group">
+                    <form th:action="@{/user/edit}" method="post" class="pr-3">
+                        <input type="hidden" th:value="${el.id}" name="id">
+                        <input value="Редактировать" type="submit" class="btn btn-outline-primary">
+                    </form>
+                    <form th:action="@{/user/delete}" method="post" class="pr-3">
+                        <input type="hidden" th:value="${el.id}" name="id">
+                        <input value="Удалить" type="submit" class="btn btn-outline-danger">
+                    </form>
+                    <form th:action="@{/user/details}" method="post">
+                        <input type="hidden" th:value="${el.id}" name="id">
+                        <input value="Детали" type="submit" class="btn btn-outline-info">
+                    </form>
+                </div>
         </tr>
         </tbody>
     </table>

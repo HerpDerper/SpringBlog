@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 @Controller
@@ -28,45 +27,64 @@ public class CommentController {
     @Autowired
     private CommentRepository commentRepository;
 
-    @GetMapping("comment/")
-    public String commentIndex(Model model) {
-        Iterable<Comment> comments = commentRepository.findAll();
-        model.addAttribute("comments", comments);
-        return "Comments/Index";
-    }
-
     @GetMapping("/comment/create")
-    public String commentCreate(Model model) {
+    public String commentCreate(@RequestParam Long postId, Model model) {
         Iterable<User> users = userRepository.findAll();
         model.addAttribute("users", users);
-        Iterable<Post> posts = postRepository.findAll();
-        model.addAttribute("posts", posts);
+        Post post = postRepository.findById(postId).get();
+        model.addAttribute("post", post);
         return "Comments/Create";
     }
 
-    @PostMapping("/comment/create")
-    public String blogCommentCreate(@RequestParam String text,
-                                 @RequestParam Long userId,
-                                 @RequestParam Long postId, Model model) {
+    @PostMapping("/comment/createComment")
+    public String blogCommentCreate(@RequestParam Long postId,
+                                    @RequestParam String text,
+                                    @RequestParam Long userId) {
         User user = userRepository.findById(userId).get();
         Post post = postRepository.findById(postId).get();
         Comment comment = new Comment(text, 0, new Date(), user, post);
         commentRepository.save(comment);
-        return "redirect:/comment/index";
+        return "redirect:/post/details?id=" + postId;
     }
 
-    @GetMapping("/comment/index")
-    public String commentFilter(@RequestParam(required = false) String text,
-                             @RequestParam(required = false) Boolean exactSearch, Model model) {
-        Iterable<Comment> comments = new ArrayList<Comment>();
-        if (text != null && !text.equals("")) {
-            if (exactSearch != null && exactSearch)
-                comments = commentRepository.findByText(text);
-            else
-                comments = commentRepository.findByTextContains(text);
-        } else
-            comments = commentRepository.findAll();
-        model.addAttribute("comments", comments);
-        return "Comments/Index";
+    @PostMapping("/comment/editComment")
+    public String blogCommentEdit(@RequestParam Long id,
+                                  @RequestParam Long postId,
+                                  @RequestParam String text,
+                                  @RequestParam Long userId) {
+        User user = userRepository.findById(userId).get();
+        Comment comment = commentRepository.findById(id).get();
+        comment.setText(text);
+        comment.setUser(user);
+        commentRepository.save(comment);
+        return "redirect:/post/details?id=" + postId;
+    }
+
+    @PostMapping("/comment/edit")
+    public String commentEdit(@RequestParam Long postId,
+                              @RequestParam Long id, Model model) {
+        Iterable<User> users = userRepository.findAll();
+        model.addAttribute("users", users);
+        Post post = postRepository.findById(postId).get();
+        model.addAttribute("post", post);
+        Comment comment = commentRepository.findById(id).get();
+        model.addAttribute("comment", comment);
+        return "Comments/Edit";
+    }
+
+    @PostMapping("/comment/details")
+    public String getSelectedComment(@RequestParam long id, Model model) {
+        Comment comment = commentRepository.findById(id).get();
+        model.addAttribute("comment", comment);
+        model.addAttribute("post", comment.getPost());
+        return "Comments/Details";
+    }
+
+    @PostMapping("/comment/delete")
+    public String commentDelete(@RequestParam long id,
+                                @RequestParam long postId) {
+        Comment comment = commentRepository.findById(id).get();
+        commentRepository.delete(comment);
+        return "redirect:/post/details?id=" + postId;
     }
 }
