@@ -32,22 +32,23 @@
     <h1>Комментарий</h1>
     <div class="row">
         <div class="col-md-4">
-            <form th:action="${'/comment/editComment'}" method="post">
+            <form th:action="${'/comment/editComment'}" method="post" th:object="${comment}">
                 <div class="form-group">
                     <label class="control-label">Текст</label>
-                    <textarea class="form-control" name="text" th:text="${comment.text}"></textarea>
+                    <textarea class="form-control" name="text" th:text="*{text}"></textarea>
+                    <div class="error text-danger" th:if="${#fields.hasErrors('text')}" th:errors="*{text}"></div>
                 </div>
                 <div class="form-group">
                     <label class="control-label">Создатель</label>
-                    <select name="userId" class="form-control">
+                    <select th:field="*{user}" class="form-control" th:value="*{user.id}">
                         <div th:each="el : ${users}">
-                            <option th:selected="${el.id == comment.user.id}" th:value="${el.id}" th:text="${el.email}"/>
+                            <option th:value="${el.id}" th:text="${el.email}"/>
                         </div>
                     </select>
                 </div>
                 <div class="form-group">
-                    <input type="hidden" name="postId" th:value="${post.id}"/>
-                    <input type="hidden" name="id" th:value="${comment.id}"/>
+                    <input type="hidden" th:field="*{post.id}" th:value="*{post.id}"/>
+                    <input type="hidden" th:field="*{id}" th:value="*{id}"/>
                     <button class="btn btn-success" type="submit">Изменить</button>
                     <a class="btn btn-danger" href="/post/index">Отмена</a>
                 </div>

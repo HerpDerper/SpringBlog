@@ -57,7 +57,7 @@
             ❤ <a th:text="${el.likeCount}"/>
         </div>
         <div class="btn-group">
-            <form th:action="@{/post/details}" method="get">
+            <form th:action="@{/post/details}" method="post">
                 <input type="hidden" th:value="${el.id}" name="id">
                 <input value="Посмотреть" type="submit" class="btn btn-outline-info">
             </form>

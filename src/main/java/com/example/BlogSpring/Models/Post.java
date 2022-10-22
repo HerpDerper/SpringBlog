@@ -1,6 +1,7 @@
 package com.example.BlogSpring.Models;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import java.util.Date;
 
 @Entity
@@ -9,10 +10,24 @@ public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String title,  description, text;
+
+    @NotBlank(message = "Тема не должна быть пустой или состоять из одних лишь пробелов")
+    @Size(min = 1, max = 30, message = "Тема должена быть от 1 до 30 символов")
+    private String title;
+
+    @NotBlank(message = "Описание не должно быть пустым или состоять из одних лишь пробелов")
+    @Size(min = 1, max = 30, message = "Описание должно быть от 1 до 30 символов")
+    private String description;
+
+    @NotBlank(message = "Текст не должен быть пустым или состоять из одних лишь пробелов")
+    @Size(min = 1, max = 300, message = "Текст должен быть от 1 до 300 символов")
+    private String text;
+
     private int likeCount;
+
     @Temporal(TemporalType.DATE)
     private Date dateCreation;
+
     @ManyToOne
     @JoinColumn(name = "userId", referencedColumnName = "id")
     private User user;
@@ -20,7 +35,7 @@ public class Post {
     public Post() {
     }
 
-    public Post(String title, String description, String text,  int likeCount, Date dateCreation, User user) {
+    public Post(String title, String description, String text, int likeCount, Date dateCreation, User user) {
         this.title = title;
         this.text = text;
         this.description = description;

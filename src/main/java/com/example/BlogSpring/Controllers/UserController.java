@@ -7,24 +7,27 @@ import com.example.BlogSpring.Repo.CommentRepository;
 import com.example.BlogSpring.Repo.PostRepository;
 import com.example.BlogSpring.Repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
 public class UserController {
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private CommentRepository commentRepository;
+    private final CommentRepository commentRepository;
 
-    @Autowired
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
+
+    public UserController(UserRepository userRepository, CommentRepository commentRepository, PostRepository postRepository) {
+        this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
+        this.postRepository = postRepository;
+    }
 
     @GetMapping("/")
     public String userIndex(Model model) {
@@ -34,18 +37,13 @@ public class UserController {
     }
 
     @GetMapping("/user/create")
-    public String userCreate(Model model) {
+    public String userCreate(@ModelAttribute("user") User user) {
         return "Users/Create";
     }
 
     @PostMapping("/user/create")
-    public String blogUserCreate(@RequestParam String name,
-                                 @RequestParam String surname,
-                                 @RequestParam String lastName,
-                                 @RequestParam String email,
-                                 @RequestParam String password,
-                                 @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date dateBirth) {
-        User user = new User(name, surname, lastName, email, password, dateBirth);
+    public String blogUserCreate(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) return "Users/Create";
         userRepository.save(user);
         return "redirect:/";
     }
@@ -64,8 +62,7 @@ public class UserController {
 
     @PostMapping("/user/details")
     public String getSelectedUser(@RequestParam long id, Model model) {
-        User user = userRepository.findById(id).get();
-        model.addAttribute("user", user);
+        model.addAttribute("user", userRepository.findById(id).get());
         return "Users/Details";
     }
 
@@ -74,39 +71,29 @@ public class UserController {
         User user = userRepository.findById(id).get();
         List<Comment> comments = commentRepository.findByUser(user);
         List<Post> posts = postRepository.findByUser(user);
-        for (Comment comment : comments) {
-            commentRepository.delete(comment);
-        }
-        for (Post post : posts) {
-            postRepository.delete(post);
-        }
+        commentRepository.deleteAll(comments);
+        postRepository.deleteAll(posts);
         userRepository.delete(user);
         return "redirect:/user/index";
     }
 
     @PostMapping("/user/editUser")
-    public String blogUserEdit(@RequestParam long id,
-                               @RequestParam String name,
-                               @RequestParam String surname,
-                               @RequestParam String lastName,
-                               @RequestParam String email,
-                               @RequestParam String password,
-                               @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date dateBirth) {
-        User user = userRepository.findById(id).get();
-        user.setName(name);
-        user.setSurname(surname);
-        user.setLastName(lastName);
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setDateBirth(dateBirth);
+    public String blogUserEdit(@ModelAttribute("user") @Valid User userValid, BindingResult bindingResult) {
+        User user = userRepository.findById(userValid.getId()).get();
+        if (bindingResult.hasErrors()) return "/Users/Edit";
+        user.setName(userValid.getName());
+        user.setSurname(userValid.getSurname());
+        user.setLastName(userValid.getLastName());
+        user.setEmail(userValid.getEmail());
+        user.setPassword(userValid.getPassword());
+        user.setDateBirth(userValid.getDateBirth());
         userRepository.save(user);
         return "redirect:/user/index";
     }
 
     @PostMapping("/user/edit")
-    public String postEdit(@RequestParam long id, Model model) {
-        User user = userRepository.findById(id).get();
-        model.addAttribute("user", user);
+    public String userEdit(@RequestParam long id, Model model) {
+        model.addAttribute("user", userRepository.findById(id).get());
         return "Users/Edit";
     }
 }

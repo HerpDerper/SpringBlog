@@ -6,55 +6,60 @@ import com.example.BlogSpring.Models.User;
 import com.example.BlogSpring.Repo.CommentRepository;
 import com.example.BlogSpring.Repo.PostRepository;
 import com.example.BlogSpring.Repo.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
 
 @Controller
 public class PostController {
-    @Autowired
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private CommentRepository commentRepository;
+    private final CommentRepository commentRepository;
+
+    public PostController(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository) {
+        this.postRepository = postRepository;
+        this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
+    }
 
     @GetMapping("post/")
     public String postIndex(Model model) {
-        Iterable<Post> posts = postRepository.findAll();
-        model.addAttribute("posts", posts);
+        model.addAttribute("posts", postRepository.findAll());
         return "Posts/Index";
     }
 
     @GetMapping("/post/create")
-    public String postCreate(Model model) {
+    public String postCreate(@ModelAttribute("post") Post post, Model model) {
         Iterable<User> users = userRepository.findAll();
         model.addAttribute("users", users);
         return "Posts/Create";
     }
 
-    @GetMapping("/post/details")
-    public String getSelectedPost(@RequestParam long id, Model model) {
+    @PostMapping("/post/details")
+    public String getSelectedPost(@ModelAttribute("comment") Comment comment, @RequestParam long id, Model model) {
         Post post = postRepository.findById(id).get();
-        List<Comment> comments = commentRepository.findByPost(post);
-        model.addAttribute("comments", comments);
+        Iterable<User> users = userRepository.findAll();
+        model.addAttribute("users", users);
+        model.addAttribute("comments", commentRepository.findByPost(post));
         model.addAttribute("post", post);
         return "Posts/Details";
     }
 
     @PostMapping("/post/create")
-    public String blogPostCreate(@RequestParam String title,
-                                 @RequestParam String description,
-                                 @RequestParam String text,
-                                 @RequestParam Long userId) {
-        User user = userRepository.findById(userId).get();
-        Post post = new Post(title, description, text, 0, new Date(), user);
+    public String blogPostCreate(@ModelAttribute("post") @Valid Post postValid, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            Iterable<User> users = userRepository.findAll();
+            model.addAttribute("users", users);
+            return "Posts/Create";
+        }
+        Post post = new Post(postValid.getTitle(), postValid.getDescription(), postValid.getText(), 0, new Date(), postValid.getUser());
         postRepository.save(post);
         return "redirect:/post/index";
     }
@@ -69,17 +74,17 @@ public class PostController {
     }
 
     @PostMapping("/post/editPost")
-    public String blogPostEdit(@RequestParam long id,
-                               @RequestParam String title,
-                               @RequestParam String description,
-                               @RequestParam String text,
-                               @RequestParam Long userId) {
-        Post post = postRepository.findById(id).get();
-        User user = userRepository.findById(userId).get();
-        post.setTitle(title);
-        post.setDescription(description);
-        post.setText(text);
-        post.setUser(user);
+    public String blogPostEdit(@ModelAttribute("post") @Valid Post postValid, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            Iterable<User> users = userRepository.findAll();
+            model.addAttribute("users", users);
+            return "Posts/Edit";
+        }
+        Post post = postRepository.findById(postValid.getId()).get();
+        post.setTitle(postValid.getTitle());
+        post.setDescription(postValid.getDescription());
+        post.setText(postValid.getText());
+        post.setUser(postValid.getUser());
         postRepository.save(post);
         return "redirect:/post/index";
     }
@@ -88,9 +93,7 @@ public class PostController {
     public String postDelete(@RequestParam long id) {
         Post post = postRepository.findById(id).get();
         List<Comment> comments = commentRepository.findByPost(post);
-        for (Comment comment : comments) {
-            commentRepository.delete(comment);
-        }
+        commentRepository.deleteAll(comments);
         postRepository.delete(post);
         return "redirect:/post/index";
     }

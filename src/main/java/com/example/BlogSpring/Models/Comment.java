@@ -1,6 +1,9 @@
 package com.example.BlogSpring.Models;
 
+import org.springframework.lang.Nullable;
+
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import java.util.Date;
 
 @Entity
@@ -9,10 +12,16 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @NotBlank(message = "Комментарий не должен быть пустым или состоять из одних лишь пробелов")
+    @Size(min = 1, max = 300, message = "Комментарий должен быть от 1 до 300 символов")
     private String text;
+
     private int likeCount;
+
     @Temporal(TemporalType.DATE)
     private Date dateCreation;
+
     @ManyToOne
     @JoinColumn(name = "userId", referencedColumnName = "id")
     private User user;
