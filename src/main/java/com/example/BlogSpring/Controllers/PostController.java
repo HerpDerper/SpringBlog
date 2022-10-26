@@ -1,15 +1,21 @@
 package com.example.BlogSpring.Controllers;
 
+import com.example.BlogSpring.Checking;
 import com.example.BlogSpring.Models.Comment;
 import com.example.BlogSpring.Models.Post;
 import com.example.BlogSpring.Models.User;
 import com.example.BlogSpring.Repo.CommentRepository;
 import com.example.BlogSpring.Repo.PostRepository;
 import com.example.BlogSpring.Repo.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.util.Date;
@@ -17,6 +23,7 @@ import java.util.List;
 
 @Controller
 public class PostController {
+
     private final PostRepository postRepository;
 
     private final UserRepository userRepository;
@@ -29,64 +36,71 @@ public class PostController {
         this.commentRepository = commentRepository;
     }
 
-    @GetMapping("post/")
+    @PostMapping("/post/index")
     public String postIndex(Model model) {
         model.addAttribute("posts", postRepository.findAll());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        model.addAttribute("adminAccess", new Checking().adminAccess(auth));
         return "Posts/Index";
     }
 
     @GetMapping("/post/create")
     public String postCreate(@ModelAttribute("post") Post post, Model model) {
-        Iterable<User> users = userRepository.findAll();
-        model.addAttribute("users", users);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        model.addAttribute("adminAccess", new Checking().adminAccess(auth));
         return "Posts/Create";
     }
 
     @PostMapping("/post/details")
     public String getSelectedPost(@ModelAttribute("comment") Comment comment, @RequestParam long id, Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        model.addAttribute("adminAccess", new Checking().adminAccess(auth));
         Post post = postRepository.findById(id).get();
-        Iterable<User> users = userRepository.findAll();
-        model.addAttribute("users", users);
         model.addAttribute("comments", commentRepository.findByPost(post));
         model.addAttribute("post", post);
+        model.addAttribute("username", auth.getName());
+        User user = userRepository.findUserByUsername(auth.getName());
+        model.addAttribute("user", user);
         return "Posts/Details";
     }
 
     @PostMapping("/post/create")
     public String blogPostCreate(@ModelAttribute("post") @Valid Post postValid, BindingResult bindingResult, Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        model.addAttribute("adminAccess", new Checking().adminAccess(auth));
         if (bindingResult.hasErrors()) {
-            Iterable<User> users = userRepository.findAll();
-            model.addAttribute("users", users);
             return "Posts/Create";
         }
-        Post post = new Post(postValid.getTitle(), postValid.getDescription(), postValid.getText(), 0, new Date(), postValid.getUser());
+        Post post = new Post(postValid.getTitle(), postValid.getDescription(), postValid.getText(), 0, new Date(), userRepository.findUserByUsername(auth.getName()));
         postRepository.save(post);
         return "redirect:/post/index";
     }
 
     @PostMapping("/post/edit")
     public String postEdit(@RequestParam long id, Model model) {
-        Iterable<User> users = userRepository.findAll();
-        model.addAttribute("users", users);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        model.addAttribute("adminAccess", new Checking().adminAccess(auth));
         Post post = postRepository.findById(id).get();
         model.addAttribute("post", post);
         return "Posts/Edit";
     }
 
     @PostMapping("/post/editPost")
-    public String blogPostEdit(@ModelAttribute("post") @Valid Post postValid, BindingResult bindingResult, Model model) {
+    public String blogPostEdit(@ModelAttribute("comment") Comment comment, @ModelAttribute("post") @Valid Post postValid, BindingResult bindingResult, Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        model.addAttribute("adminAccess", new Checking().adminAccess(auth));
+        Post post = postRepository.findById(postValid.getId()).get();
         if (bindingResult.hasErrors()) {
-            Iterable<User> users = userRepository.findAll();
-            model.addAttribute("users", users);
             return "Posts/Edit";
         }
-        Post post = postRepository.findById(postValid.getId()).get();
         post.setTitle(postValid.getTitle());
         post.setDescription(postValid.getDescription());
         post.setText(postValid.getText());
-        post.setUser(postValid.getUser());
         postRepository.save(post);
-        return "redirect:/post/index";
+        model.addAttribute("post", post);
+        model.addAttribute("comments", commentRepository.findByPost(post));
+        model.addAttribute("username", auth.getName());
+        return "Posts/Details";
     }
 
     @PostMapping("/post/delete")
@@ -101,6 +115,8 @@ public class PostController {
     @GetMapping("/post/index")
     public String postFilter(@RequestParam(required = false) String description,
                              @RequestParam(required = false) Boolean exactSearch, Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        model.addAttribute("adminAccess", new Checking().adminAccess(auth));
         Iterable<Post> posts;
         if (description != null && !description.equals("")) {
             if (exactSearch != null && exactSearch) posts = postRepository.findByDescription(description);
@@ -108,5 +124,25 @@ public class PostController {
         } else posts = postRepository.findAll();
         model.addAttribute("posts", posts);
         return "Posts/Index";
+    }
+
+    @PostMapping("/post/likePost")
+    public String blogPostLike(@ModelAttribute("comment") Comment comment, @RequestParam long id, Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        model.addAttribute("adminAccess", new Checking().adminAccess(auth));
+        model.addAttribute("username", auth.getName());
+        User user = userRepository.findUserByUsername(auth.getName());
+        Post post = postRepository.findById(id).get();
+        model.addAttribute("post", post);
+        model.addAttribute("comments", commentRepository.findByPost(post));
+        if (post.getLikedUsers().contains(user)) {
+            post.setLikeCount(post.getLikeCount() - 1);
+            post.getLikedUsers().remove(user);
+        } else {
+            post.setLikeCount(post.getLikeCount() + 1);
+            post.getLikedUsers().add(user);
+        }
+        postRepository.save(post);
+        return "Posts/Details";
     }
 }

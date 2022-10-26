@@ -20,11 +20,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/post/index">Посты</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" th:if="${adminAccess}">
                         <a class="nav-link" href="/user/index">Пользователи</a>
                     </li>
                 </ul>
-                <form>
+                <form class="pr-3">
                     <div class="form-inline form-group">
                         <input type="text" name="description"  class="form-control" placeholder="Тема"/>
                         <div class="col-auto my-0">
@@ -33,7 +33,12 @@
                                 <label class="custom-control-label" for="customControl">Точный поиск</label>
                             </div>
                         </div>
-                        <input class="btn btn-success" formmethod="get" type="submit" formaction="/post/index" value="Поиск" />
+                        <input class="btn btn-success" formmethod="get" type="submit" formaction="/post/index" value="Поиск"/>
+                    </div>
+                </form>
+                <form th:action="@{/logout}" method="post">
+                    <div class="form-inline form-group">
+                        <input class="btn btn-danger" type="submit" value="Выйти">
                     </div>
                 </form>
             </div>
@@ -45,7 +50,7 @@
     <a class="btn btn-primary" href="/post/create" style="margin-bottom:0.5em">Добавить</a>
     <div class="card card_margin" th:each="el : ${posts}">
         <div class="card-header">
-            <a class="card-title" th:text="${el.user.email}"/>
+            <a class="card-title" th:text="${el.user.username}"/>
             </br>
             <a th:text="${el.dateCreation}" class="opacity"/>
         </div>
@@ -64,10 +69,6 @@
         </div>
     </div>
 </div>
-<footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; 2022 - SpringHasCome
-    </div>
-</footer>
+<div th:insert="Footer"></div>
 </body>
 </html>

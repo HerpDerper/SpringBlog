@@ -7,33 +7,13 @@
     <link media="all" rel="stylesheet" th:href="@{/css/style2.css}" type="text/css"/>
 </head>
 <body>
-<header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-        <div class="container">
-            <a class="navbar-brand" href="/post/index">BlogSpring</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/post/index">Посты</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/user/index">Пользователи</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-</header>
+<div th:insert="Header"></div>
 <div class="container">
     <h1>Комментарий</h1>
     <tbody>
     <dl class="row">
         <dd class="col-sm-10">
-            Автор: <a th:text="${comment.user.email}"/>
+            Автор: <a th:text="${comment.user.username}"/>
         </dd>
         <dd class="col-sm-10">
             Текст: <a th:text="${comment.text}"/>
@@ -53,9 +33,5 @@
     </dl>
 </div>
 </body>
-<footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; 2022 - SpringHasCome
-    </div>
-</footer>
+<div th:insert="Footer"></div>
 </html>

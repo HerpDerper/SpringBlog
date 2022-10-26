@@ -1,10 +1,15 @@
 package com.example.BlogSpring.Models;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 public class User {
@@ -22,11 +27,12 @@ public class User {
     @Pattern(regexp = "[a-zA-Zа-яА-Я]{1,30}", message = "Отчество должно быть от 1 до 30 символов и состоять только из букв")
     private String lastName;
 
+    @NotBlank(message = "Логин не должен быть пустым или состоять из одних лишь пробелов")
     @Column(unique = true)
-    @Email(regexp = "[a-zA-Z0-9]{3,20}@[a-zA-Z0-9]{3,15}[.][a-zA-Z]{2,5}", message = "Некорретный ввод электронной почты")
-    private String email;
+    @Size(min = 1, max = 16, message = "Логин должен должен быть от 1 до 16 символов")
+    private String username;
 
-    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()â€\"[{}]:;'.,?/*~$^+=<>]).{8,16}$", message = "Пароль должен быть от 8 до 16 символов и содержать спицсимволы, цифры строчные и прописные латинские буквы")
+    @NotBlank
     private String password;
 
     @NotNull(message = "Дата рождения не должна быть пустой")
@@ -35,14 +41,29 @@ public class User {
     @Temporal(TemporalType.DATE)
     private Date dateBirth;
 
+    private boolean active;
+
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "userRole", joinColumns = @JoinColumn(name = "userId"))
+    @Enumerated(EnumType.STRING)
+    private Set<Role> roles;
+
+    @OneToOne
+    @JoinColumn(name = "contactDataId", referencedColumnName = "id")
+    private ContactData contactData;
+
+    @ManyToMany
+    @JoinTable(name = "likedUsers", joinColumns = @JoinColumn(name = "userId"), inverseJoinColumns = @JoinColumn(name = "postId"))
+    public List<Post> likedPosts;
+
     public User() {
     }
 
-    public User(String name, String surname, String lastName, String email, String password, Date dateBirth) {
+    public User(String name, String surname, String lastName, String username, String password, Date dateBirth) {
         this.name = name;
         this.surname = surname;
         this.lastName = lastName;
-        this.email = email;
+        this.username = username;
         this.password = password;
         this.dateBirth = dateBirth;
     }
@@ -79,12 +100,12 @@ public class User {
         this.lastName = lastName;
     }
 
-    public String getEmail() {
-        return email;
+    public String getUsername() {
+        return username;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -101,5 +122,37 @@ public class User {
 
     public void setDateBirth(Date dateBirth) {
         this.dateBirth = dateBirth;
+    }
+
+    public ContactData getContactData() {
+        return contactData;
+    }
+
+    public void setContactData(ContactData contactData) {
+        this.contactData = contactData;
+    }
+
+    public List<Post> getLikedPosts() {
+        return likedPosts;
+    }
+
+    public void setLikedPosts(List<Post> likedPosts) {
+        this.likedPosts = likedPosts;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 }

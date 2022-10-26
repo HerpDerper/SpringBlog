@@ -21,13 +21,14 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/post/index">Посты</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" th:if="${adminAccess}">
                         <a class="nav-link" href="/user/index">Пользователи</a>
                     </li>
                 </ul>
-                <form>
+                <form class="pr-3">
                     <div class="form-inline form-group">
-                        <input type="text" name="description" class="form-control" placeholder="Тема"/>
+                        <input type="hidden" name="id" th:value="${post.id}"/>
+                        <input type="text" name="description" class="form-control" placeholder="Текст"/>
                         <div class="col-auto my-0">
                             <div class="custom-control custom-checkbox mr-sm-2">
                                 <input type="checkbox" class="custom-control-input" id="customControl">
@@ -35,6 +36,11 @@
                             </div>
                         </div>
                         <input class="btn btn-success" formmethod="get" type="submit" formaction="/post/index" value="Поиск" />
+                    </div>
+                </form>
+                <form th:action="@{/logout}" method="post">
+                    <div class="form-inline form-group">
+                        <input class="btn btn-danger" type="submit" value="Выйти">
                     </div>
                 </form>
             </div>
@@ -46,7 +52,7 @@
         <div class="card-header">
             <dl class="row">
                 <dd class="col-sm-10">
-                    Автор: <a th:text="*{user.email}"/>
+                    Автор: <a th:text="*{user.username}"/>
                 </dd>
                 <a th:text="*{dateCreation}" class="opacity"/>
                 <dd class="col-sm-10">
@@ -61,14 +67,18 @@
             <a th:text="*{text}"/>
         </div>
         <div class="card-footer">
-            ❤ <a th:text="*{likeCount}"/>
+            <form th:action="${'/post/likePost'}" method="post">
+                <input type="hidden" name="id" th:value="${post.id}"/>
+                <button type="submit">❤</button>
+                <a th:text="*{likeCount}"/>
+            </form>
         </div>
         <div class="btn-group">
-            <form th:action="@{/post/edit}" method="post" class="pr-3">
+            <form th:if="${username==post.user.username||adminAccess}" th:action="@{/post/edit}" method="post" class="pr-3">
                 <input type="hidden" th:value="*{id}" name="id">
                 <input value="Редактировать" type="submit" class="btn btn-outline-primary">
             </form>
-            <form th:action="@{/post/delete}" method="post" class="pr-3">
+            <form th:if="${username==post.user.username||adminAccess}" th:action="@{/post/delete}" method="post" class="pr-3">
                 <input type="hidden" th:value="*{id}" name="id">
                 <input value="Удалить" type="submit" class="btn btn-outline-danger">
             </form>
@@ -81,14 +91,6 @@
             <div class="error text-danger" th:if="${#fields.hasErrors('text')}" th:errors="*{text}"></div>
         </div>
         <div class="form-group">
-            <label class="control-label">Создатель</label>
-            <select th:field="*{user}" class="form-control">
-                <div th:each="el : ${users}">
-                    <option th:value="${el.id}" th:text="${el.email}"/>
-                </div>
-            </select>
-        </div>
-        <div class="form-group">
             <input type="hidden" name="postId" th:value="${post.id}"/>
             <button class="btn btn-success" type="submit">Написать комментарий</button>
         </div>
@@ -97,7 +99,7 @@
     <tbody th:each="el : ${comments}">
     <dl class="row">
         <dd class="col-sm-10">
-            Автор: <a th:text="${el.user.email}"/>
+            Автор: <a th:text="${el.user.username}"/>
         </dd>
         <a th:text="${el.dateCreation}" class="opacity"/>
         <dd class="col-sm-10">
@@ -107,12 +109,12 @@
     <a th:text="${el.text}"/>
     <br/>
     <div class="btn-group">
-        <form th:action="@{/comment/edit}" method="post" class="pr-3">
+        <form th:if="${username==el.user.username||adminAccess}" th:action="@{/comment/edit}" method="post" class="pr-3">
             <input type="hidden" th:value="${el.id}" name="id">
             <input type="hidden" th:value="${post.id}" name="postId">
             <input value="Редактировать" type="submit" class="btn btn-outline-primary">
         </form>
-        <form th:action="@{/comment/delete}" method="post" class="pr-3">
+        <form th:if="${username==el.user.username||adminAccess}" th:action="@{/comment/delete}" method="post" class="pr-3">
             <input type="hidden" th:value="${el.id}" name="id">
             <input type="hidden" th:value="${post.id}" name="postId">
             <input value="Удалить" type="submit" class="btn btn-outline-danger">
@@ -127,9 +129,5 @@
     </div>
 </div>
 </body>
-<footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; 2022 - SpringHasCome
-    </div>
-</footer>
+<div th:insert="Footer"></div>
 </html>

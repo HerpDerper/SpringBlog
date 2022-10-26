@@ -7,27 +7,7 @@
     <link media="all" rel="stylesheet" th:href="@{/css/style2.css}" type="text/css"/>
 </head>
 <body>
-<header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-        <div class="container">
-            <a class="navbar-brand" href="/post/index">BlogSpring</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/post/index">Посты</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/user/index">Пользователи</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-</header>
+<div th:insert="Header"></div>
 <div class="container">
     <h1>Пользователь</h1>
     <div class="row">
@@ -50,13 +30,13 @@
                     <div class="error text-danger" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label">Электронная почта</label>
-                    <input type="text" class="form-control" th:field="*{email}" th:value="*{email}">
-                    <div class="error text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                    <label class="control-label">Логин</label>
+                    <input type="text" class="form-control" th:field="*{username}" th:value="*{username}">
+                    <div class="error text-danger" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
                 </div>
                 <div class="form-group">
                     <label class="control-label">Пароль</label>
-                    <input type="text" class="form-control" th:field="*{password}" th:value="*{password}">
+                    <input type="password" class="form-control" th:field="*{password}" th:value="*{password}">
                     <div class="error text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
                 </div>
                 <div class="form-group">
@@ -73,9 +53,5 @@
     </div>
 </div>
 </body>
-<footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; 2022 - SpringHasCome
-    </div>
-</footer>
+<div th:insert="Footer"></div>
 </html>

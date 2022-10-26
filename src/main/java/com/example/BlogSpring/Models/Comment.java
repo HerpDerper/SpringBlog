@@ -1,7 +1,5 @@
 package com.example.BlogSpring.Models;
 
-import org.springframework.lang.Nullable;
-
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.util.Date;

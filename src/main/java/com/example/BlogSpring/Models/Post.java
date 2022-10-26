@@ -1,8 +1,10 @@
 package com.example.BlogSpring.Models;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 public class Post {
@@ -26,11 +28,16 @@ public class Post {
     private int likeCount;
 
     @Temporal(TemporalType.DATE)
+
     private Date dateCreation;
 
     @ManyToOne
     @JoinColumn(name = "userId", referencedColumnName = "id")
     private User user;
+
+    @ManyToMany
+    @JoinTable(name = "likedUsers", joinColumns = @JoinColumn(name = "postId"), inverseJoinColumns = @JoinColumn(name = "userId"))
+    public List<User> likedUsers;
 
     public Post() {
     }
@@ -98,5 +105,13 @@ public class Post {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<User> getLikedUsers() {
+        return likedUsers;
+    }
+
+    public void setLikedUsers(List<User> likedUsers) {
+        this.likedUsers = likedUsers;
     }
 }

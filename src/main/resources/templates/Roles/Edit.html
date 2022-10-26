@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Изменение комментария</title>
+    <title>Изменение роли у пользователя</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link media="all" rel="stylesheet" th:href="@{/css/style1.css}" type="text/css"/>
     <link media="all" rel="stylesheet" th:href="@{/css/style2.css}" type="text/css"/>
@@ -9,20 +9,21 @@
 <body>
 <div th:insert="Header"></div>
 <div class="container">
-    <h1>Комментарий</h1>
+    <h1>Роли</h1>
     <div class="row">
         <div class="col-md-4">
-            <form th:action="${'/comment/editComment'}" method="post" th:object="${comment}">
+            <form th:action="${'/role/editRole'}" method="post" th:object="${user}">
+                <input type="hidden" name="userId" th:value="*{id}"/>
                 <div class="form-group">
-                    <label class="control-label">Текст</label>
-                    <textarea class="form-control" name="text" th:text="*{text}"></textarea>
-                    <div class="error text-danger" th:if="${#fields.hasErrors('text')}" th:errors="*{text}"></div>
+                    <label class="control-label">Роль</label>
+                    <select class="form-control" name="roleId">
+                        <option th:value="0" th:text="ADMIN"/>
+                        <option th:value="1" th:text="USER"/>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <input type="hidden" th:field="*{post.id}" th:value="*{post.id}"/>
-                    <input type="hidden" th:field="*{id}" th:value="*{id}"/>
                     <button class="btn btn-success" type="submit">Изменить</button>
-                    <a class="btn btn-danger" href="/post/index">Отмена</a>
+                    <a class="btn btn-danger" href="/user/index">Отмена</a>
                 </div>
             </form>
         </div>

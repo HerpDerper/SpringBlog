@@ -7,27 +7,7 @@
     <link media="all" rel="stylesheet" th:href="@{/css/style2.css}" type="text/css"/>
 </head>
 <body>
-<header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-        <div class="container">
-            <a class="navbar-brand" href="/post/index">BlogSpring</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/post/index">Посты</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/user/index">Пользователи</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-</header>
+<div th:insert="Header"></div>
 <div class="container">
     <h1>Пользователь</h1>
     <tbody>
@@ -42,13 +22,25 @@
             Отчество: <a th:text="${user.lastName}"/>
         </dd>
         <dd class="col-sm-10">
-            Email: <a th:text="${user.email}"/>
+            Логин: <a th:text="${user.username}"/>
         </dd>
         <dd class="col-sm-10">
-           Дата рождения: <a th:text="${user.dateBirth}"/>
+            Дата рождения: <a th:text="${user.dateBirth}"/>
         </dd>
         <dd class="col-sm-10">
             Пароль: <a th:text="${user.password}"/>
+        </dd>
+        <dd class="col-sm-10">
+            Роли: <a th:text="${user.roles}"/>
+        </dd>
+        <dd class="col-sm-10" th:if="${user.contactData!=null}">
+            Адрес: <a th:text="${user.contactData.address}"/>
+        </dd>
+        <dd class="col-sm-10" th:if="${user.contactData!=null}">
+            Электронная почта: <a th:text="${user.contactData.email}"/>
+        </dd>
+        <dd class="col-sm-10" th:if="${user.contactData!=null}">
+            Номер телефона: <a th:text="${user.contactData.phone}"/>
         </dd>
         <div class="col-sm-10">
             <a class="btn btn-danger" href="/user/index">Назад</a>
@@ -56,9 +48,5 @@
     </dl>
 </div>
 </body>
-<footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; 2022 - SpringHasCome
-    </div>
-</footer>
+<div th:insert="Footer"></div>
 </html>
