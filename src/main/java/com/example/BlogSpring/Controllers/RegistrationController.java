@@ -5,7 +5,6 @@ import com.example.BlogSpring.Models.User;
 import com.example.BlogSpring.Repo.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -18,13 +17,13 @@ import java.util.Collections;
 public class RegistrationController {
 
     private final PasswordEncoder passwordEncoder;
+
     private final UserRepository userRepository;
 
     public RegistrationController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
-
 
     @PostMapping("/registration")
     public String blogUserCreate(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
